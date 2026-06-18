@@ -20,6 +20,8 @@
     --salmon:     #f6a78e;
     --salmon-dk:  #e98c70;
     --orange:     #f4b25a;
+    --mango:      #ffc233;   /* タグ用アクセント（マンゴーイエロー） */
+    --mango-dk:   #e9a40f;
     --brown:      #5a463c;   /* 文字色（ダークブラウン） */
     --brown-soft: #8a7468;
     --shadow:     rgba(180, 120, 90, 0.18);
@@ -438,51 +440,65 @@
     color: var(--brown-soft);
   }
 
-  /* ===== 作品詳細パネル ===== */
+  /* ===== 作品詳細モーダル ===== */
   .detail-overlay {
     display: none;
     position: fixed;
     inset: 0;
     z-index: 100;
-    background: linear-gradient(160deg, var(--cream) 0%, var(--cream-2) 40%, var(--pink) 100%);
+    background: rgba(0, 0, 0, 0.6);   /* 背景の一覧が透けて見える暗いオーバーレイ */
     overflow-y: auto;
-    padding: 40px 20px 60px;
+    padding: 30px 18px;
   }
   .detail-overlay.show {
-    display: block;
-    animation: fadeIn 0.3s ease;
+    display: flex;
+    animation: fadeIn 0.25s ease;
   }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes popIn {
+    from { transform: translateY(14px) scale(0.98); opacity: 0; }
+    to   { transform: none; opacity: 1; }
+  }
 
+  /* モーダル本体（縦並びカード・幅は動画に揃える） */
   .detail-inner {
-    width: 92%;
-    max-width: 1000px;
-    margin: 0 auto;
+    position: relative;
+    width: 100%;
+    max-width: 760px;                   /* 動画の横幅に揃え、情報も同じ幅に収める */
+    margin: auto;                       /* 縦横中央＋はみ出してもスクロール可能 */
+    background: var(--cream);
+    border-radius: 24px;                /* 大きめの丸みでやわらかい印象に */
+    padding: 56px 46px 50px;            /* ゆったりした余白 */
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+    animation: popIn 0.25s ease;
   }
-  .detail-back {
-    font-family: inherit;
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--salmon-dk);
-    background: #fff;
-    border: none;
-    padding: 11px 24px;
-    border-radius: 999px;
-    cursor: pointer;
-    box-shadow: 0 5px 14px var(--shadow);
-    transition: transform 0.2s ease;
-    margin-bottom: 28px;
-  }
-  .detail-back:hover { transform: translateX(-3px); }
 
-  .detail-grid {
-    display: flex;
-    gap: 34px;
-    align-items: flex-start;
-    flex-wrap: wrap;
+  /* 右上の✕（閉じる）：円形・ホバーで回転 */
+  .detail-close {
+    position: absolute;
+    top: 16px; right: 16px;
+    width: 42px; height: 42px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.15rem;
+    font-family: inherit;
+    color: var(--brown);
+    background: #fff;
+    border: 2px solid var(--pink);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 4px 12px var(--shadow);
+    transition: transform 0.35s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    z-index: 2;
   }
-  .detail-video-area { flex: 1 1 56%; min-width: 280px; }
-  /* 動画埋め込み（iframe） */
+  .detail-close:hover {
+    transform: rotate(90deg);           /* ホバーでくるっと回転 */
+    background: var(--salmon);
+    color: #fff;
+    border-color: var(--salmon);
+  }
+
+  /* 上：動画（大きめ） */
+  .detail-video-area { width: 100%; }
   .detail-video {
     position: relative;
     width: 100%;
@@ -501,7 +517,7 @@
   }
   /* 動画下の注意書き */
   .detail-note {
-    margin-top: 12px;
+    margin-top: 14px;
     font-size: 0.82rem;
     color: var(--brown-soft);
     text-align: center;
@@ -511,27 +527,63 @@
     text-decoration: underline;
   }
 
-  .detail-info { flex: 1 1 34%; min-width: 260px; }
+  /* 下：情報 */
+  .detail-info {
+    width: 100%;
+    margin-top: 32px;
+  }
   .detail-info h2 {
     font-size: 1.4rem;
     font-weight: 900;
-    line-height: 1.5;
+    line-height: 1.45;
     color: var(--brown);
-    margin-bottom: 16px;
+    margin-bottom: 20px;
   }
-  .detail-tags { margin-bottom: 24px; }
+  .detail-tags {
+    margin-bottom: 28px;
+  }
+
   .detail-label {
-    font-size: 0.95rem;
-    font-weight: 700;
+    font-size: 0.98rem;
+    font-weight: 800;
     color: var(--salmon-dk);
-    border-left: 4px solid var(--salmon);
-    padding-left: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
   }
-  .detail-info p {
+  .detail-label::before {
+    content: "✎ ";
+  }
+  /* 概要欄：高さ固定＋エリア内スクロール＋ごく薄いドット柄テクスチャ */
+  #detail-desc {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 20px 22px;
+    border-radius: 16px;
     font-size: 0.96rem;
+    line-height: 1.7;
     color: var(--brown);
     white-space: pre-wrap;
+    border: 1px solid rgba(246, 167, 142, 0.25);
+    /* 薄いクリーム地＋ごく薄いドット柄 */
+    background-color: #fffdf9;
+    background-image: radial-gradient(rgba(246, 167, 142, 0.10) 1px, transparent 1px);
+    background-size: 14px 14px;
+    /* 控えめなスクロールバー（Firefox） */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(140, 110, 90, 0.35) transparent;
+  }
+  /* 控えめなスクロールバー（Chrome / Safari / Edge） */
+  #detail-desc::-webkit-scrollbar {
+    width: 6px;
+  }
+  #detail-desc::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  #detail-desc::-webkit-scrollbar-thumb {
+    background: rgba(140, 110, 90, 0.3);
+    border-radius: 999px;
+  }
+  #detail-desc::-webkit-scrollbar-thumb:hover {
+    background: rgba(140, 110, 90, 0.5);
   }
 
   /* スマホ調整 */
@@ -540,6 +592,9 @@
     .hero { height: auto; padding: 14px 0; }
     .hero-inner { flex-direction: column; gap: 12px; }
     .hero-cta { font-size: 0.85rem; padding: 10px 22px; }
+    .detail-inner { padding: 50px 20px 32px; border-radius: 20px; }
+    .detail-info { margin-top: 24px; }
+    .detail-info h2 { font-size: 1.2rem; }
   }
 </style>
 </head>
@@ -625,25 +680,29 @@
     © 2026 椎柚あげ / SeeyuAge
   </footer>
 
-  <!-- ===== 作品詳細パネル（クリックで表示） ===== -->
+  <!-- ===== 作品詳細モーダル（クリックで表示） ===== -->
   <div class="detail-overlay" id="detail">
     <div class="detail-inner">
-      <button class="detail-back" id="detail-back">← 一覧に戻る</button>
-      <div class="detail-grid">
-        <div class="detail-video-area">
-          <div class="detail-video">
-            <iframe id="detail-iframe" src="" title="作品動画"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowfullscreen></iframe>
-          </div>
-          <p class="detail-note">動画が再生できない場合は<a id="detail-yt-link" href="#" target="_blank" rel="noopener">YouTube</a>でご覧ください</p>
+      <button class="detail-close" id="detail-close" aria-label="閉じる">✕</button>
+
+      <!-- 上：動画（大きめ） -->
+      <div class="detail-video-area">
+        <div class="detail-video">
+          <iframe id="detail-iframe" src="" title="作品動画"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen></iframe>
         </div>
-        <div class="detail-info">
-          <h2 id="detail-title"></h2>
-          <div class="detail-tags">
-            <span class="tag" id="detail-year"></span>
-            <span class="tag" id="detail-role"></span>
-          </div>
+        <p class="detail-note">動画が再生できない場合は<a id="detail-yt-link" href="#" target="_blank" rel="noopener">YouTube</a>でご覧ください</p>
+      </div>
+
+      <!-- 下：情報 -->
+      <div class="detail-info">
+        <h2 id="detail-title"><span id="detail-title-text"></span></h2>
+        <div class="detail-tags">
+          <span class="tag" id="detail-year"></span>
+          <span class="tag" id="detail-role"></span>
+        </div>
+        <div id="detail-desc-section">
           <h3 class="detail-label">概要</h3>
           <p id="detail-desc"></p>
         </div>
@@ -680,11 +739,759 @@
     { title: "TVアニメ『姫様\"拷問\"の時間です』第2期ノンクレジットエンディング映像｜『ユイカ』「お姫様にはなれない」", id: "dvhpqvIwrfs", role: "編集", year: "2026年", cat: "anime", description: "" },
 
     // --- ショート動画（縦長） ---
-    { title: "Pokémon TCG: NINJA & GYARU EP2", id: "-SYKfgJFBSc", role: "編集", year: "確認中", cat: "short", description: "" },
-    { title: "Pokémon TCG: NINJA & GYARU EP10", id: "5JHkdkdZfQU", role: "編集", year: "確認中", cat: "short", description: "" },
+    { title: "Pokémon TCG: NINJA & GYARU EP2", id: "-SYKfgJFBSc", role: "編集", year: "2023年", cat: "short", description: "" },
+    { title: "Pokémon TCG: NINJA & GYARU EP10", id: "5JHkdkdZfQU", role: "編集", year: "2024年", cat: "short", description: "" },
     { title: "【PR】Adoの素顔にディオールのスキンケア、ル ボーム。", id: "mSAS3iDdy9Y", role: "構成・編集", year: "2026年", cat: "short", description: "" },
-    { title: "いのちのパレヱド（しゃばけ）", id: "3Jb_DufvUYA", role: "構成・編集", year: "確認中", cat: "short", thumb: "https://img.youtube.com/vi/3Jb_DufvUYA/hqdefault.jpg", description: "" }
+    { title: "いのちのパレヱド（しゃばけ）", id: "3Jb_DufvUYA", role: "構成・編集", year: "2025年", cat: "short", thumb: "https://img.youtube.com/vi/3Jb_DufvUYA/hqdefault.jpg", description: "" }
   ];
+
+  // ===== 各作品の概要欄テキスト（動画IDで対応）=====
+  const descriptions = {
+"z_PYVPUsDyc": `#ろふあーと #ろふまお #ROFMAO
+2025.10.09 Release New Single "" おったまげったん ""
+NHK『みんなのうた』10-11月新曲
+※本MVはNHK『みんなのうた』の映像ではありません
+
+作詞・作曲・編曲：山崎真吾 (SUPA LOVE)
+All Instruments & Programming：山崎真吾 (SUPA LOVE)
+
+Vocal Recording Engineer：秋葉知伸 (SUPA LOVE)
+Mixing Engineer：渡辺紀明 (SUPA LOVE)
+Vocal Recording Studio：SUPA LOVE STUDIO
+
+各種ストリーミングサイトにて好評配信中。
+https://rof-mao.lnk.to/ottamaID
+
+◾️ミュージックビデオ
+Illustrator：Gurin.
+Movie：椎柚あげ(R11R)
+
+==========
+
+■ROF-MAOとは
+体を張ってなんでもやります、見た目だけじゃないカッコよさ
+加賀美ハヤト/剣持刀也/不破湊/甲斐田晴の4名が集った男性VTuberユニット。
+誰からも愛される面白くてカッコイイユニットを目指し、
+YouTubeでのバラエティ企画や音楽活動を中心に幅広く活動している。
+
+■SNS
+公式サイト：http://www.rof-mao.com
+X（旧Twitter）：@rof_mao
+LINE：https://lin.ee/IbW2C4i
+Instagram：@rof_mao
+TikTok：@rof_mao
+
+■ハッシュタグ
+#ろふまお
+#ろふまお塾
+#ろふあーと
+#ROFMAO
+
+■メンバー
+加賀美ハヤト　X：@h_kagami2434
+剣持刀也　X：@rei_toya_rei
+不破湊　X：@fuwa_minato
+甲斐田晴　X：@kaida_haru
+
+※未成年者の視聴者の方々は、下記リンク先の注意事項もご覧ください。
+https://www.anycolor.co.jp/notice-for...`,
+"KKxPzUTQJ3Y": `『サヨナラ天国また来て地獄』
+ワンダーランズ×ショウタイム × 初音ミク
+作詞・作曲：john　https://x.com/casablancalanca
+
+イラスト：matumot　https://x.com/matumot12
+動画：椎柚あげ　https://x.com/ppae00_2001
+
+公式サイト：https://pjsekai.sega.jp
+公式X：@pj_sekai
+
+(C) SEGA
+(C) Colorful Palette Inc.
+(C) Crypton Future Media, INC. www.piapro.net
+商品名および社名は各社の登録商標です。`,
+"YFZ7m57EDDA": `『帝乃三姉妹は案外、チョロい。』第2弾楽曲！
+▶ダウンロード/ストリーミング配信：https://orcd.co/colorful-palette
+▶インスト音源：https://piapro.jp/t/jsHP
+
+”日曜日のメゾンデ”は架空の音楽アパート”MAISONdes”のどこかにある本棚。そこに並ぶ「少年サンデー」「サンデーうぇぶり」から生まれた漫画作品を、さまざまなクリエイターが音楽にし、ボーカル礼衣が歌うアーティストプロジェクト。
+あなたのための物語も、きっと見つかる。
+
+「カラフルパレット」
+Vocal：礼衣　@reibowwow
+Music & Lyrics & Arrangement：ふるーり　@furu_ri
+Gt. 小林ファンキ風格　@kfukaku_paris
+Ba. はす。　@rarirureyoko
+Pf. モリカホ
+Pf. Recording：P.C.P.　@pcp_info
+
+Illustration : ふるいけ　@start_furuike
+Background illustration : ごった煮ス〜プ❣️　@babyoo0n
+Movie : 椎柚あげ(R11R)　@ppae00_2001
+
+■関連楽曲配信情報
+
+「君にふさわしい奇跡」
+TVアニメ『帝乃三姉妹は案外、チョロい。』OPテーマ
+2025年7月10日(木)配信リリース
+作詞・作曲・編曲：くじら / 歌唱：礼衣
+配信リンク：https://orcd.co/nichimezo_miracle
+
+「YOU」
+原作『帝乃三姉妹は案外、チョロい。』インスパイアソング
+2025年8月20日(水)配信リリース
+作詞・作曲・編曲：Twinfield / 歌唱：礼衣
+配信リンク：https://orcd.co/nichimezo_you
+
+■TVアニメ『帝乃三姉妹は案外、チョロい。』
+2025年7月9日より毎週水曜24:30～各局にて放送中！
+
+◆公式サイト：https://mikadono.family/
+◆公式X：https://x.com/mikadono_anime
+◆公式TikTok：https://www.tiktok.com/@mikadono_sist...
+
+■放送情報
+TOKYO MX：7月9日(水)より　毎週水曜24:30～
+とちぎテレビ：7月9日(水)より　毎週水曜24:30～
+群馬テレビ：7月9日(水)より　毎週水曜24:30～
+BS11：7月9日(水)より　毎週水曜24:30～
+MBS：7月12日（土）より　毎週土曜26:08～
+山陰放送：7月12日（土）より　毎週土曜26:15～
+AT-X：7月11日（土）より　毎週金曜21:30～
+※AT-X リピート放送：7月15日より毎週火曜9:30～、7月17日より毎週木曜15:30～
+
+■配信情報
+Prime Videoほかにて2025年7月9日（水）より毎週水曜25:00配信！
+dアニメストア／dアニメストア ニコニコ支店／dアニメストア for Prime Video／Netflix
+DMM TV／バンダイチャンネル／Hulu／U-NEXT／アニメ放題／FOD／TELASA（見放題プラン）
+J:COM STREAM（見放題）／milplus見放題パックプライム／ABEMA／Lemino／AnimeFesta
+ディズニープラス／アニメタイムズ
+
+■原作『帝乃三姉妹は案外、チョロい。』(ひらかわあや　小学館刊／少年サンデーコミックス)
+週刊少年サンデーにて絶賛連載中！コミックス1〜15巻 大好評発売中!!
+文武芸、3つの才能を併せ持つ国民的大女優、綾世昴。
+彼女を母に持った息子、綾世優はなにをやっても平均以下の凡人だった！
+勝手に期待されて、勝手にがっかりされる……。
+そんな人生を歩んできた優は、唯一の家族だった母が亡くなり、知人の家に預けられることに。
+その家には、芸能科・体育科・進学科が備わる超名門・才華学園で、各学科トップの成績を修め『三帝』と呼ばれている帝乃三姉妹が!?
+天才三姉妹との同居生活をスタートさせるも、優をポンコツ呼ばわりし見下す三姉妹。
+しかし「幸せな家族を作って」という母からの最期の願いを叶えるべく努力する優の姿に、三姉妹は次第に心を動かされ──。
+一つ屋根の下、天才・帝乃三姉妹と凡人・綾世優が"家族"になるまでのお話。
+
+週刊少年サンデー：https://websunday.net/
+サンデーうぇぶり：https://www.sunday-webry.com/
+
+■日曜日のメゾンデ
+Official HP：https://www.maisondes-6half.com/
+X(日曜日のメゾンデ)：@nichimezo
+X (MAISONdes)：@maisondes_6half`,
+"lPbf_4k-jmE": `三月のパンタシア
+
+「LuMiNA」
+Vocals：みあ
+Lyrics：みあ
+Music & Arrangement：駄菓子O型
+All Instruments & Programming：駄菓子O型
+Recording & Mixing Engineer：諏訪桂輔
+
+Illustrator：うずた
+Movie：椎柚あげ(R11R)
+
+・配信URL
+https://3pasi.lnk.to/LuMiNA
+
+[イベント情報]
+三月のパンタシア 10th ANNIVERSARY LIVE 2025 多彩透明なブルーだった
+日時：2025年8月16日(土) 16:00開場 / 17:00開演
+開場：Zepp Shinjuku
+チケット料金：￥6,600(税込) ※ドリンク代は別途必要
+
+=======================================
+三月のパンタシア
+HP：http://www.phantasia.jp/
+Twitter：https://x.com/3_phantasia
+YouTube Channel：https://bit.ly/2EVYpqR
+note：https://note.com/3_phantasia/
+=======================================
+
+#三月のパンタシア`,
+"FHjSj8v8Rxo": `Streaming/DL：https://kujira.lnk.to/NotTheOnlyFlower
+Off Vocal：https://piapro.jp/t/NCge
+
+花屋の店先に並んだ花はどれもみんな綺麗だね。
+
+■Credit
+
+オンリーワンとはいえ/ We are "NOT" the only flower in the world
+
+[ Music ]
+Music, Words, Arrangement, Vocal, Prod：くじら
+Chorus：水槽
+Guitar：Takayuki "kojiro" Sasaki
+Bass：Rock Sakurai
+All other instruments：くじら
+MIX：さぶろう
+
+[ Music Video ]
+Illustlation：もるひ
+Animation, Composite, Edit：椎柚あげ(R11R)
+Creative produced by くじら
+
+■X：@whaledontsleep
+■Instagram：https://instagram.com/whaledontsleep
+■Mail：info@whaledontsleep.tokyo`,
+"oB9JO0dWmYs": `常世ノ国 4th Music Video 「汀にてキミをさがす」
+
+Music/Arrangement/Recording/Mix：ツタガワユウキ
+Lyrics/Vo：朝際イコ
+
+MV Credit
+illustration : 朝際イコ
+Producer: 朝際イコ
+Movie : 椎柚あげ
+
+■常世ノ国とは？
+過去の後悔と未来の希望の間で揺れる心をテーマにしたクリエイティブ集団。
+儚くも力強い歌声とストーリーテリングが特徴。
+イラストレーター/漫画家である朝際イコを中心にイラスト、漫画、アニメ、音楽のセルフメディアミックスのプロジェクト。
+
+X：@tocoyo_no_kuni
+Instagram：@tocoyo_no_kuni
+
+#常世ノ国 #汀にてキミをさがす #オリジナル曲 #アニメMV #幻想音楽`,
+"WamAYBu3sgQ": `不安だらけな この世界は妙に美しいんだ
+
+配信ストア / DL&Streaming⇨https://linkco.re/AvEfRcXu
+
+#vsinger #vtuber #水瀬凪6th #みなせのおうた #水瀬凪
+
+Vocal：水瀬 凪
+Lyrics：かわむら　@eikikunni
+Music：ポップしなないで　@pop_snnid
+Guitar：小林ファンキ風格　@kfukaku_PARIS
+Bass：カワノアキ　@gudetm_ak
+Rec / Mix Engineering：大島久明　@hisaaki1974
+
+Illust：色田　@mogmog_skd
+Logo Design：neybell　@neybell_
+Movie：椎柚あげ（R11R）　@PPAE00_2001
+MV production Assistant Director：林 祐太（R11R）
+Label Director：及川奈穂
+
+🌟ファンレター･プレゼントの宛先🌟
+〒106-0032 東京都港区六本木6-11-1 六本木ヒルズゲートタワー RK Music社 水瀬 凪 宛
+詳細▶︎ https://rkmusic.jp/fanletter/
+
+水瀬 凪/MINASE Nagi🐺🫧
+アウトバースト系3歳児。
+弾き語りや歌、ゲーム、時にはおしゃべりなどマルチにノンストップ！
+YouTube & REALITYを中心に元気に活動中。
+
+X(旧：Twitter)：@minase_nagi7
+RK Music ライブユニオン所属 ❁ https://rkmusic.jp/`,
+"Zi2wiDu_ViM": `三月のパンタシア×ナナヲアカリ
+
+■配信はこちら
+https://3pasi.lnk.to/Iwannabeanangel
+
+「天使になりたいっ！」
+Vocals：みあ,ナナヲアカリ
+Lyrics & Music：ナユタン星人
+Arrangement：堀江晶太,ナユタン星人
+Illustration：謝謝いぬ
+Movie：椎柚あげ(R11R)
+
+[イベント情報]
+タイトル：「三月春のパン(タシア)祭り 2025 -リベンジの春-」
+日時：2025年3月29日(土) 16:30開場 / 17:30開演
+会場：Spotify O-EAST
+出演アーティスト：Sou / ナナヲアカリ / 三月のパンタシア
+チケット料金：￥7,700(税込) ※ドリンク代は別途必要
+Thank you! Sold OUT!!
+
+=======================================
+三月のパンタシア
+HP：http://www.phantasia.jp/
+Twitter：https://x.com/3pasi_official
+YouTube Channel：https://bit.ly/2EVYpqR
+note：https://note.com/3_phantasia/
+=======================================
+
+#三月のパンタシア #ナナヲアカリ`,
+"RlAxZSglEhI": `ミクちゃん・テトちゃん・GUMIちゃんにも歌ってもらいました♥
+
+■Vocal：初音ミク・重音テト・GUMI
+
+■Music
+Lyric：Gohgo
+Compose：Soma Genda & pw.a & Gohgo
+Music Direction：大山 徹也
+Vocal Trainer：SLAVE.V-V-R
+
+■Movie
+Illustration：その
+movie：椎柚あげ(R11R)
+
+■inst
+https://piapro.jp/t/pTiN
+
+■オフィシャルサイト：https://www.sachiko.co.jp
+■TikTok：@sachiko_seven...
+■Twitter：@sachiko_5884
+■Instagram：@kobayashi_sachiko_5884
+
+#初音ミク #重音テト #gumilang_studio`,
+"u4jBXRiC2iU": `amazarashi 「空白の車窓から」 Digital Release.
+https://smar.lnk.to/7vQ43h
+
+amazarashi NEW ALBUM
+七号線ロストボーイズ
+2022.04.13 Release.
+
+七号線ロストボーイズ　特設サイト
+https://www.amazarashi.com/nanagousen...
+
+Illust : wataboku
+Motion : Seeyu Age / Toya Aono
+Director : YKBX`,
+"d3Eqz55SxlA": `『アンチユー』
+MORE MORE JUMP！ × 巡音ルカ
+作詞・作曲：Chinozo　https://x.com/chinozo_
+
+イラスト : 謝謝いぬ　https://x.com/inu_totemo
+動画 : 椎柚あげ(R11R)　https://x.com/ppae00_2001
+アイテムデザイン : Rum　https://x.com/gyuuunyuuupaaan
+制作：R11R　https://r11r.jp/
+
+公式サイト：https://pjsekai.sega.jp
+公式X：@pj_sekai
+
+(C) SEGA
+(C) Colorful Palette Inc.
+(C) Crypton Future Media, INC. www.piapro.net
+商品名および社名は各社の登録商標です。`,
+"_zJQAEdwJ9g": `「ヨフケノパレエド-MIDNIGHT PARADE-」
+
+2026.2.4.Wed Digital Release
+楽曲リンク：https://9lana.lnk.to/MidnightParade
+
+Lyrics：9Lana／Tana.H
+Music：Tana.H／Marchin
+Mix：vis
+Mastering：前田廉二
+Movie：椎柚あげ(R11R)（https://x.com/PPAE00_2001）
+Illustration/Animation：謝謝いぬ（https://x.com/inu_totemo）
+Logo Design：neybell（https://x.com/neybell_）
+Storyboard：SHU`,
+"zunFoF97vLc": `Half time Old / 暁光
+アニメ「惑星のさみだれ」オープニングテーマ
+音源はこちら　https://HalftimeOld.lnk.to/Gyoukou
+
+ヤングキングアワーズにて連載された水上悟志氏による漫画がアニメ化。アニメ情報サイト「アニメ！アニメ！」では アニメ化してほしいマンガ1位にも選ばれた話題作。惑星を砕く「ビスケットハンマー」の脅威から世界を救ってほしいと願う人の言葉を喋るトカゲ「ノイ」との出会い、そしてさみだれのために戦いに身を投じる主人公夕日の決意をHalf time Oldが歌うオープニングテーマ「暁光」が彩ります。
+
+コメント
+この度、オープニングテーマを担当させていただく「暁光」は、主人公「雨宮夕日」が”過去を乗り越えて成長していく姿”を音と詞で表現しました。
+作品を読ませていただいて「周りの人と触れ合う事で、一人では気付けないような事に気づき、雨宮夕日の中で世界が変わっていく」表現がとても感動的で自分と重ねています。
+「惑星のさみだれ」という作品に寄り添いながら、楽曲も より昇華させるものになれたらと思っています。(Vo, Gt 鬼頭大晴)
+
+■放送情報
+7月8日よりMBS/TBS”アニメイズム”枠（毎週金曜日深夜1時55分〜）
+7月10日よりBS11（毎週日曜日深夜0時30分〜）
+7月14日よりとちぎテレビ（毎週木曜日23時～）
+7月19日よりテレビ北海道（毎週火曜日25時30分～）
+7月11日よりAT-X（毎週月曜日21時30分～）
+
+暁光
+作詞　鬼頭大晴
+作曲　鬼頭大晴・Naoki Itai
+編曲　Naoki Itai・Half time Old
+
+暁光 Music Video
+Produced by R11R
+Character Design / Animation：Imada Wabi
+Title Design：Saki Kitamura
+Composite / Edit：SeeyuAge(R11R)
+Director：Toya Aono
+
+#halftimeold #暁光 #惑星のさみだれ`,
+"rp87DCF-l6o": `『カラフルファンデーション』
+MORE MORE JUMP！ × KAITO
+作詞・作曲：みきとP　https://x.com/mikito_p_
+
+イラスト：秋鷲　https://x.com/superciderx
+ロゴ/アイテムデザイン：neybell　https://x.com/neybell_
+動画：椎柚あげ(R11R)　https://x.com/ppae00_2001
+
+公式サイト：https://pjsekai.sega.jp
+公式X：@pj_sekai
+
+(C) SEGA
+(C) Colorful Palette Inc.
+(C) Crypton Future Media, INC. www.piapro.net
+商品名および社名は各社の登録商標です。`,
+"L1i4JiU28Y8": `楽曲配信はこちら：https://3pasi.lnk.to/TwistedHero
+
+三月のパンタシア
+「あまのじゃくヒーロー」
+作詞：みあ　作曲：瀬尾祥太郎(MONACA)　編曲：堀江晶太、瀬尾祥太郎(MONACA)
+
+Vocal：みあ
+Drums：ゆーまお
+All Other Instruments & Programming：堀江晶太
+Recording Engineer：古市暁大、大島花梨
+Mixing Engineer：諏訪桂輔
+Mastering Engineer：石橋 香(Sony Music Studios Tokyo)
+
+illust：雨故
+movie：椎柚あげ(R11R)
+
+■12/3 10枚目シングルリリース
+予約URL：https://3pasi.lnk.to/1203PKG
+
+＜1形態にて発売＞
+期間生産限定盤[CD+DVD] VVCL-2827〜2828 ￥1,980(税込)
+※アニメ描きおろしイラスト使用デジパック仕様
+
+・収録楽曲
+01 あまのじゃくヒーロー
+作詞：みあ　作曲：瀬尾祥太郎(MONACA)　編曲：堀江晶太、瀬尾祥太郎(MONACA)
+02 うたかたの声
+作詞：みあ　作曲：けんたあろは　編曲：Saku
+03 あまのじゃくヒーロー TV size
+04 あまのじゃくヒーロー Instrumental
+
+・DVD
+TVアニメ「顔に出ない柏田さんと顔に出る太田君」ノンクレジットエンディング映像
+
+[イベント情報]
+三月のパンタシア主催イベント「三月春のパン(タシア)祭り」開催決定！！！
+日時：2026年3月28日(土) 16:30開場 / 17:30開演
+会場：Spotify O-EAST（東京都渋谷区道玄坂2-14-8 2F）
+出演アーティスト：三月のパンタシア / CHiCO（CHiCO with HoneyWorks） / ヒトリエ
+
+・公演＆チケット詳細はこちら
+https://www.phantasia.jp/live/
+
+=======================================
+三月のパンタシア
+HP：http://www.phantasia.jp/
+Twitter：https://x.com/3pasi_official
+YouTube Channel：https://bit.ly/2EVYpqR
+note：https://note.com/3_phantasia/
+=======================================
+
+#三月のパンタシア`,
+"y_359JwW-vE": `夜のひと笑い　3rdシングル『別れ』
+2022年9月10日　各サイトで一斉配信開始♪
+https://big-up.style/3OxEto9eJD
+
+別れ/夜のひと笑い
+Lyrics：コミヤマリオ・Gom (MARUMOCHI)
+Music：コミヤマリオ (MARUMOCHI)
+Arrangement：HoneyWorks
+イラスト：トウカ
+動画：椎柚あげ
+
+♪1stシングル『ミライチズ』MV
+♪ミライチズの各配信サイトでの視聴はこちらから
+https://big-up.style/7gD9PW8tUa
+
+♪2ndシングル『ワライカタ』
+♪ワライカタの各配信サイトでの視聴はこちらから
+https://big-up.style/LyfK2PN3rF
+
+Twitter
+いちえ：@ichie19991027
+こう：@nakaikou1
+
+■ファンレター・プレゼントの宛先はこちら
+150-0011 東京都渋谷区東1-26-20 東京建物東渋谷ビル8F
+「株式会社carry on 夜のひと笑い」宛
+※冷蔵・冷凍が必要な、なま物の受付はできません。
+
+■お仕事のご依頼等
+https://carry0n.co.jp/contact/corpora...`,
+"-lgHpWPtV4U": `HoneyWorks × 星乃夢奈
+
+アーティストデビューソング
+「男の子のために可愛いわけじゃない！／星乃夢奈」
+https://linkco.re/guN6SZhB
+
+歌：星乃夢奈
+作詞：Gom
+作曲：メブキユウ
+編曲：HoneyWorks
+イラスト：棉きのし
+動画：SeeyouAge(R11R)
+
+🌈オフボーカル音源
+https://piapro.jp/t/mbdw
+「歌ってみた」お待ちしてます🤍
+
+🌈TikTok人気急上昇ランクイン記念、TikTokオリジナル動画投稿キャンペーン
+『男の子のために可愛いわけじゃない！』のTikTok人気急上昇ランクインを記念し、TikTokでオリジナル動画を作成し、投稿してくださった方を対象としたプレゼントキャンペーンを開催致しました。
+
+■実施期間
+2023年5月3日（水）〜5月16日(火)23:59まで
+
+■特典内容
+抽選で10名様に『男の子のために可愛いわけじゃない！』音楽キーホルダー＆星乃夢奈サイン入りチェキをプレゼント！
+
+🌈1stシングルリリース記念イベント開催
+日程：2023年5月27日(土) 開場16:30 開演17:00 終演18:00（予定）
+場所：TOKIO TOKYO（東京都渋谷区宇田川町3-7-B1）
+
+🌈期間限定オフィシャルグッズ販売
+■販売グッズ：
+・男の子のために可愛いわけじゃない！オリジナルTシャツ　¥4,000
+・男の子のために可愛いわけじゃない！音楽キーホルダー　¥1,500
+・男の子のために可愛いわけじゃない！オリジナル缶バッジ3種　¥600
+
+■ご予約はこちらから！
+https://hoshinoyuna.base.shop/`,
+"jfGn6VGAEL0": `『トリコロール・ステップ 2025』MVを公開！
+5カ月連続デジタルシングルリリース第2弾✨
+
+メジャー2nd配信シングル✦『トリコロール・ステップ 2025』
+▽配信サイト
+https://aogiri.lnk.to/ts2025YT
+
+▽MUSIC
+Vocal：
+・音霊魂子　@tamako0212
+・石狩あかり　@akari0415
+・山黒音玄　@nekuro0412
+・栗駒こまる　@komaru0814
+・エトラ　@etrachannel
+・春雨麗女　@urame0711
+・ぷわぷわぽぷら　@popura0119
+Lyrics：Jun Kuroda（USAGI Production）
+Music：Jun Kuroda（USAGI Production）
+Arranged：nerdwitchkomugichan
+
+▽MUSIC VIDEO
+動画：椎柚あげ(R11R)／杜水 天(R11R)
+アニメーション：謝謝いぬ
+イラスト：謝謝いぬ／くまぞう
+
+メジャー1st配信シングル✦『お前のまともはまともじゃない』
+https://aogiri.lnk.to/OMMJYT
+
+メジャー3rd配信シングル✦『ミス・プリマベーラス』
+https://aogiri.lnk.to/MSPRYT
+
+メジャー4th配信シングル✦『PLAYERS「A」』
+https://aogiri.lnk.to/PLAYT
+
+メジャー5th配信シングル✦『たぶん人生はバグだらけ』
+https://aogiri.lnk.to/bugYT
+
+▽『あおバム』収録内容
+M01:お前のまともはまともじゃない／音霊魂子・石狩あかり・千代浦蝶美・我部りえる・春雨麗女・萌実
+M02:諸行無常ってやつですか？／音霊魂子・石狩あかり・千代浦蝶美・我部りえる・春雨麗女
+M03:えっえっえっ♡／山黒音玄・栗駒こまる・我部りえる・うる虎がーる
+M04:コピペパペット／石狩あかり・我部りえる・春雨麗女・八十科むじな
+M05:ミス・プリマベーラス／石狩あかり・山黒音玄・萌実・うる虎がーる
+M06:カオスですがなにか？／月赴ゐぶき・うる虎がーる・八十科むじな
+M07:つまづきコレクション／音霊魂子・石狩あかり・ぷわぷわぽぷら・萌実（coming soon）
+M08:たぶん人生はバグだらけ／栗駒こまる・我部りえる・千代浦蝶美・エトラ・ぷわぷわぽぷら
+M09:PLAYERS「A」／音霊魂子・石狩あかり・山黒音玄・栗駒こまる・千代浦蝶美・我部りえる・エトラ・春雨麗女・ぷわぷわぽぷら・萌実・月赴ゐぶき・うる虎がーる・八十科むじな
+M10:トリコロール・ステップ 2025／音霊魂子・石狩あかり・山黒音玄・栗駒こまる・エトラ・春雨麗女・ぷわぷわぽぷら
+
+#あおぎり高校 #VtuberHighSchool #音霊魂子 #石狩あかり #山黒音玄 #栗駒こまる #エトラ #春雨麗女 #ぷわぷわぽぷら`,
+"S-6tQHg2Mr8": `「その感情に"恋"と名が付く2歩手前。」
+
+TVアニメ『久保さんは僕を許さない』ノンクレジットエンディングを公開🌟
+
+エンディングテーマ「かすかでたしか」
+DIALOGUE＋
+作詞・作曲：田淵智也　編曲：広川恵一（MONACA）　オーケストラアレンジ：滝澤俊輔（TRYTONELABO）
+2023年3月22日（水）発売
+
+🌸TVアニメ『久保さんは僕を許さない』作品情報🌸
+
+゜○ On Air ○゜
+AT-X：2023年1月10日より　毎週火曜　21:30～
+TOKYO MX：2023年1月10日より　毎週火曜　24:30～
+MBS：2023年1月10日より　毎週火曜　27:00～
+BS11：2023年1月10日より　毎週火曜　24:30～
+
+゜○ Introduction ○゜
+高校１年生・白石純太には、誰にも真似できない性質があった。
+隣にいても気付かれない、毎日出席していても欠席だと誤解される――。
+彼は、存在感ゼロの"モブ"男子だったのだ。
+それでも彼なりに慎ましく学園生活を送っていたのだが、ちょっぴり厄介なことが一つだけ。
+なんと同じクラスの"ヒロイン級"美少女･久保さんだけが、彼を見つけてはちょっかいを出してくるのだ。
+特別になれない"モブ"男子と、彼の前に現れた"ヒロイン"女子。
+教室の隅から、青春は緩やかに色づき始めて――。
+誰だって、誰かの"特別"になれる。でもその感情に"恋"と名が付くには、まだ二人は少しだけ幼い。
+
+゜○ Staff ○゜
+原作：雪森寧々（集英社「週刊ヤングジャンプ」連載）
+監督：古賀一臣
+シリーズ構成・脚本：高橋悠也
+キャラクターデザイン：齊藤佳子
+音楽：夢見クジラ
+アニメーション制作：PINE JAM
+
+゜○ Cast ○゜
+久保渚咲：花澤香菜
+白石純太：河西健吾
+久保明菜：伊藤美来
+久保沙貴：雨宮天
+工藤葉月：加隈亜衣
+平玉緒：竹達彩奈
+白石由恵：能登麻美子
+
+゜○ Music ○゜
+オープニングテーマ「ドラマチックじゃなくても」花澤香菜
+エンディングテーマ「かすかでたしか」DIALOGUE＋
+
+゜○ Web ○゜
+https://kubosan-anime.jp/
+゜○ Twitter ○゜
+@kubosan_anime
+
+©雪森寧々／集英社・久保さんは僕を許さない製作委員会
+
+illustration：オカユウリ
+Movie：椎柚あげ(R11R)`,
+"38-HaU1TRDY": `エンディングテーマ：LEEVELLES「明日は明日の風が吹く」
+LEEVELLES 3rd Digital Single「明日は明日の風が吹く」
+2024年1月9日(火)配信スタート！
+https://leevelles.lnk.to/ashitaPR
+
+LEEVELLES公式HP：https://www.leevelles.jp
+LEEVELLES公式X(旧Twitter)：https://x.com/leevelles
+
+アニメ公式HP：https://himesama-goumon.com
+アニメ公式X（旧Twitter）：@himesama_goumon
+
+＜放送情報＞
+2024年1月8日よりTOKYO MX、BS11、関西テレビにて放送開始
+・TOKYO MX：1月8日（月）より毎週月曜日24時00分～
+・BS11：1月8日（月）より毎週月曜日24時00分～
+・関西テレビ：1月14日（日）より毎週日曜日26時29分～
+・AT-X：1月9日（火）より毎週火曜日21時30分～
+
+＜イントロダクション＞
+国王軍と魔王軍が衝突をはじめ、幾年月。
+王女にして、国王軍第三騎士団"騎士団長"である姫は、魔王軍によって囚われの身となっていた。
+「姫様"拷問"の時間です」
+監禁された姫を待ち受けていたのは、身悶えるような"拷問"の数々……。
+ほわほわの焼きたてトースト！湯気がたちのぼる深夜のラーメン！愛くるしい動物たちと遊ぶ時間！
+美味しい食事＆楽しい遊びを容赦なく突きつけられた姫は、"拷問"に打ち勝ち王国の秘密を守り抜くことができるのか！？
+誰もが笑顔になれる世界一やさしい"拷問"ファンタジーアニメ開幕！
+
+＜スタッフ＞
+原作：春原ロビンソン・ひらけい（集英社「少年ジャンプ＋」連載）
+監督：金森陽子
+シリーズ構成：筆安一幸
+キャラクターデザイン：河野敏弥・古橋 聡
+音楽：横山 克
+アニメーション制作：PINE JAM
+
+＜キャスト＞
+姫：白石晴香
+エクス：小林親弘
+トーチャー・トルチュール：伊藤 静
+陽鬼：永瀬アンナ
+陰鬼：井上ほの花
+クロル：山根 綺
+ジャイアント：茅野愛衣
+マオマオちゃん：日高里菜
+ルルン：中原麻衣
+ギルガ：千本木彩花
+バニラ・ペシュッツ：富田美憂
+カナッジ：福島 潤
+ジモチ：大塚芳忠
+魔王：玄田哲章
+
+＜主題歌＞
+オープニングテーマ：shallm「まっさかさマジック！」
+エンディングテーマ：LEEVELLES「明日は明日の風が吹く」
+
+公式HP：https://himesama-goumon.com
+
+©春原ロビンソン・ひらけい／集英社・国王軍第三騎士団
+
+#姫様拷問の時間です
+#白石晴香 #小林親弘 #伊藤静 #永瀬アンナ #井上ほの花 #山根綺 #茅野愛衣 #千本木彩花 #富田美憂 #日高里菜 #中原麻衣 #福島潤 #大塚芳忠 #玄田哲章
+
+illustration：HER
+Movie：椎柚あげ(R11R)
+Director：Toya Aono`,
+"dvhpqvIwrfs": `エンディングテーマ：『ユイカ』「お姫様にはなれない」
+
+『ユイカ』オフィシャルHP
+https://www.universal-music.co.jp/yuika/
+
+■アニメ公式HP：https://himesama-goumon.com
+■アニメ公式X：https://x.com/himesama_goumon
+
+■第2期放送・配信情報
+・放送情報
+TOKYO MX：2026年1月12日（月）より毎週月曜日23時30分～
+BS11：2026年1月12日（月）より毎週月曜日23時30分～
+カンテレ：2026年1月18日（日）より毎週日曜日26時24分～
+AT-X：2026年1月13日（火）より毎週火曜日23時30分～
+テレビ北海道：2026年1月15日（木）より毎週火曜日26時00分～
+
+・配信情報
+ABEMAにて地上波同時・WEB最速配信
+2026年1月12日（月）より毎週月曜日23時30分～
+
+■第1期放送・配信情報
+各配信サービスにて好評配信中
+
+【イントロダクション】
+国王軍と魔王軍が衝突をはじめ、幾年月。
+王女にして、国王軍第三騎士団"騎士団長"である姫は、魔王軍によって囚われの身となっていた。
+「姫様"拷問"の時間です」
+監禁された姫を待ち受けていたのは、身悶えるような"拷問"の数々……。
+ほわほわの焼きたてトースト！湯気がたちのぼる深夜のラーメン！愛くるしい動物たちと遊ぶ時間！
+美味しい食事＆楽しい遊びを容赦なく突きつけられた姫は、"拷問"に打ち勝ち王国の秘密を守り抜くことができるのか！？
+誰もが笑顔になれる世界一やさしい"拷問"ファンタジーアニメ開幕！
+
+【スタッフ】
+原作：春原ロビンソン・ひらけい（集英社ジャンプコミックス刊）
+監督：金森陽子
+シリーズ構成：大知慶一郎
+キャラクターデザイン：河野敏弥
+音楽：横山 克
+アニメーション制作：PINE JAM
+
+【主題歌】
+オープニングテーマ：ILLIT「Sunday Morning」
+エンディングテーマ：『ユイカ』「お姫様にはなれない」
+
+【キャスト】
+姫：白石晴香
+エクス：小林親弘
+トーチャー・トルチュール：伊藤 静
+陽鬼：永瀬アンナ
+陰鬼：井上ほの花
+クロル：山根 綺
+ジャイアント：茅野愛衣
+マオマオちゃん：日高里菜
+ルルン：中原麻衣
+ギルガ：千本木彩花
+バニラ・ペシュッツ：富田美憂
+カナッジ：福島 潤
+ジモチ：大塚芳忠
+魔王：玄田哲章
+サクラ・ハートロック：田村睦心
+ハムちゃん：田村ゆかり
+ペン太：杉田智和
+
+©春原ロビンソン・ひらけい／集英社・国王軍第三騎士団
+
+絵コンテ/衣装デザイン：謝謝いぬ
+illustration：an minami
+Movie：椎柚あげ(R11R)
+Director：Toya Aono`
+  };
+  // 概要テキストを各作品の概要欄（description）に反映
+  works.forEach(w => { if (descriptions[w.id]) w.description = descriptions[w.id]; });
 
   // ===== カテゴリ定義 =====
   const cats = [
@@ -743,18 +1550,21 @@
   const detail    = document.getElementById("detail");
   const dIframe   = document.getElementById("detail-iframe");
   const dYtLink   = document.getElementById("detail-yt-link");
-  const dTitle    = document.getElementById("detail-title");
+  const dTitleText = document.getElementById("detail-title-text");
   const dYear     = document.getElementById("detail-year");
   const dRole     = document.getElementById("detail-role");
   const dDesc     = document.getElementById("detail-desc");
+  const dDescSec  = document.getElementById("detail-desc-section");
 
   function openDetail(w) {
     dIframe.src = `https://www.youtube.com/embed/${w.id}?rel=0&modestbranding=1`;
     dYtLink.href = "https://youtu.be/" + w.id;
-    dTitle.textContent = w.title;
+    dTitleText.textContent = w.title;
     dYear.textContent  = w.year;
     dRole.textContent  = w.role;
     dDesc.textContent  = w.description ? w.description : "（概要は準備中です）";
+    // ショート動画は概要欄セクション（見出し含む）を非表示
+    dDescSec.style.display = (w.cat === "short") ? "none" : "";
     detail.classList.add("show");
     document.body.style.overflow = "hidden";   // 背面のスクロールを止める
     detail.scrollTop = 0;
@@ -766,7 +1576,7 @@
     dIframe.src = "";   // 動画を停止（裏で再生され続けるのを防ぐ）
   }
 
-  document.getElementById("detail-back").addEventListener("click", closeDetail);
+  document.getElementById("detail-close").addEventListener("click", closeDetail);
   // 背景（暗い余白）クリックでも閉じる
   detail.addEventListener("click", (e) => { if (e.target === detail) closeDetail(); });
   // Escキーで閉じる
