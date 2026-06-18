@@ -130,6 +130,8 @@
     transform: translateY(-2px);
     box-shadow: 0 10px 22px rgba(233, 140, 112, 0.55);
   }
+  /* 通常時はメールアイコンを隠してテキストのみ表示 */
+  .hero-cta .cta-icon { display: none; }
 
   /* ===== セクション共通 ===== */
   section { padding: 80px 0; }
@@ -350,16 +352,27 @@
     margin-bottom: 28px;
     color: var(--brown);
   }
+  /* 依頼文：通常はPC用を表示、スマホ用は隠す */
+  .contact-lead-sp { display: none; }
   .mail-btn {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-width: 280px;
     background: linear-gradient(90deg, var(--salmon-dk), var(--salmon));
     color: #fff;
     font-weight: 700;
     font-size: 1.1rem;
-    padding: 17px 48px;
+    padding: 17px 32px;
     border-radius: 999px;
     box-shadow: 0 10px 26px rgba(233, 140, 112, 0.45);
     transition: transform 0.2s ease;
+  }
+  .mail-btn-icon {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
   }
   .mail-btn:hover { transform: translateY(-4px) scale(1.03); }
 
@@ -372,12 +385,15 @@
   }
   /* Xボタン */
   .x-btn {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 280px;
     background: #111;
     color: #fff;
     font-weight: 700;
     font-size: 1.1rem;
-    padding: 17px 40px;
+    padding: 17px 32px;
     border-radius: 999px;
     box-shadow: 0 10px 26px rgba(0,0,0,0.22);
     transition: transform 0.2s ease;
@@ -589,9 +605,28 @@
   /* スマホ調整 */
   @media (max-width: 600px) {
     .profile-card { padding: 34px 24px; }
-    .hero { height: auto; padding: 14px 0; }
-    .hero-inner { flex-direction: column; gap: 12px; }
-    .hero-cta { font-size: 0.85rem; padding: 10px 22px; }
+    /* 依頼文：スマホではスマホ用の改行に切り替え */
+    .contact-lead-pc { display: none; }
+    .contact-lead-sp { display: block; }
+    /* スマホでも横並びを維持し、高さをコンパクトに */
+    .hero { height: 80px; }
+    .hero-inner { gap: 12px; }
+    .hero-left { gap: 12px; }
+    .hero-icon { width: 54px; height: 54px; border-width: 2px; }
+    .hero-names .role { font-size: 0.68rem; }
+    .hero-names h1 { font-size: 1.15rem; line-height: 1.25; }
+    .hero-names .roman { font-size: 0.62rem; letter-spacing: 0.15em; }
+    /* 依頼ボタンを丸いメールアイコンに切り替え */
+    .hero-cta {
+      width: 46px; height: 46px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hero-cta .cta-label { display: none; }
+    .hero-cta .cta-icon { display: block; line-height: 1; }
+    .hero-cta .cta-icon svg { display: block; }
     .detail-inner { padding: 50px 20px 32px; border-radius: 20px; }
     .detail-info { margin-top: 24px; }
     .detail-info h2 { font-size: 1.2rem; }
@@ -611,7 +646,14 @@
           <div class="roman">SeeyuAge</div>
         </div>
       </div>
-      <a class="hero-cta" href="mailto:a_seeyu@r22r.jp">お仕事の依頼はこちら</a>
+      <a class="hero-cta" href="mailto:a_seeyu@r22r.jp" aria-label="お仕事の依頼はこちら">
+        <span class="cta-label">お仕事の依頼はこちら</span>
+        <span class="cta-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="#fff" width="22" height="22">
+            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+          </svg>
+        </span>
+      </a>
     </div>
   </header>
 
@@ -628,8 +670,11 @@
           <h3>椎柚あげ <span style="font-size:0.8rem; color:var(--brown-soft);">/ SeeyuAge</span></h3>
           <div class="sub">映像クリエイター</div>
           <p>
-            音楽と物語に寄り添った映像づくりを大切にしています。<br>
-            MVを中心に、観てくださる方の心がふっと温まるような、やわらかい映像をお届けします。
+            音楽と物語に寄り添った映像づくりを大切にしています
+          </p>
+          <p style="margin-top:18px;">
+            家には5歳になるトイプードルがいます🐶<br>
+            最近は「mojojojo」集めにはまっています
           </p>
         </div>
       </div>
@@ -665,11 +710,12 @@
         <h2>お仕事のご依頼</h2>
       </div>
       <div class="contact-card">
-        <p>お仕事のご依頼・ご相談はいつでも大歓迎です！<br>
+        <p class="contact-lead contact-lead-pc">お仕事のご依頼・ご相談はいつでも大歓迎です！<br>
         お気軽にご連絡ください！お待ちしております✨</p>
+        <p class="contact-lead contact-lead-sp">お仕事のご依頼・ご相談は<br>いつでも大歓迎です！<br>お気軽にご連絡ください！<br>お待ちしております✨</p>
         <div class="contact-btns">
-          <a class="mail-btn" href="mailto:a_seeyu@r22r.jp">✉️ メールで依頼する</a>
-          <a class="x-btn" href="https://x.com/messages/compose?recipient_id=ppae00_2001" target="_blank" rel="noopener">X（旧Twitter）でDMする</a>
+          <a class="mail-btn" href="mailto:a_seeyu@r22r.jp"><svg class="mail-btn-icon" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>メールで依頼する</a>
+          <a class="x-btn" href="https://x.com/messages/compose?recipient_id=ppae00_2001" target="_blank" rel="noopener">XでDMする</a>
         </div>
       </div>
 
@@ -1496,7 +1542,7 @@ Director：Toya Aono`
   // ===== カテゴリ定義 =====
   const cats = [
     { key: "mv",    label: "MV" },
-    { key: "anime", label: "アニメED" },
+    // { key: "anime", label: "アニメED" },   // 一旦非表示（戻す時はこの行のコメントを外す）
     { key: "short", label: "ショート動画" }
   ];
 
