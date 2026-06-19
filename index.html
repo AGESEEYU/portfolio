@@ -631,6 +631,29 @@
     .detail-info { margin-top: 24px; }
     .detail-info h2 { font-size: 1.2rem; }
   }
+
+  /* ===== カスタムカーソル（丸い追従カーソル） ===== */
+  /* マウス操作のPC等のみデフォルトカーソルを隠す（タッチ端末は通常どおり） */
+  @media (hover: hover) and (pointer: fine) {
+    * { cursor: none !important; }
+  }
+  .custom-cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    /* サーモンピンク（--salmon）＋透明感 */
+    background: rgba(246, 167, 142, 0.45);
+    border: 1.5px solid rgba(233, 140, 112, 0.7);
+    pointer-events: none;
+    z-index: 100000;
+    opacity: 0;
+    /* なめらかな追従と拡大 */
+    transition: transform 0.12s ease-out, opacity 0.25s ease;
+    will-change: transform;
+  }
 </style>
 </head>
 <body>
@@ -673,7 +696,7 @@
             音楽と物語に寄り添った映像づくりを大切にしています
           </p>
           <p style="margin-top:18px;">
-            家には5歳になるトイプードルがいます🐶<br>
+            家には4歳になるトイプードルがいます🐶<br>
             最近は「mojojojo」集めにはまっています
           </p>
         </div>
@@ -1400,7 +1423,8 @@ https://kubosan-anime.jp/
 ©雪森寧々／集英社・久保さんは僕を許さない製作委員会
 
 illustration：オカユウリ
-Movie：椎柚あげ(R11R)`,
+Movie：椎柚あげ(R11R)
+Director：Toya Aono`,
 "38-HaU1TRDY": `エンディングテーマ：LEEVELLES「明日は明日の風が吹く」
 LEEVELLES 3rd Digital Single「明日は明日の風が吹く」
 2024年1月9日(火)配信スタート！
@@ -1542,7 +1566,7 @@ Director：Toya Aono`
   // ===== カテゴリ定義 =====
   const cats = [
     { key: "mv",    label: "MV" },
-    // { key: "anime", label: "アニメED" },   // 一旦非表示（戻す時はこの行のコメントを外す）
+    { key: "anime", label: "アニメED" },
     { key: "short", label: "ショート動画" }
   ];
 
@@ -1630,6 +1654,47 @@ Director：Toya Aono`
 
   // 初期表示（MV）
   render("mv");
+
+  // ===== カスタムカーソル（丸い追従カーソル） =====
+  (function () {
+    // マウス操作の端末のみ有効化（タッチ端末では何もしない）
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+
+    const cursor = document.createElement("div");
+    cursor.className = "custom-cursor";
+    document.body.appendChild(cursor);
+
+    let lastX = window.innerWidth / 2;
+    let lastY = window.innerHeight / 2;
+    let hovering = false;
+
+    // 現在位置＋拡大率を反映（中央が指先に来るよう -50% 補正）
+    function apply() {
+      const scale = hovering ? 2 : 1;   // 12px → 24px
+      cursor.style.transform =
+        `translate(${lastX}px, ${lastY}px) translate(-50%, -50%) scale(${scale})`;
+    }
+
+    // ホバーで拡大する対象（リンク・ボタン・カード・タブ）
+    const hoverTargets = "a, button, .card, .tab, .mail-btn, .all-btn, .detail-close";
+
+    document.addEventListener("mousemove", (e) => {
+      lastX = e.clientX;
+      lastY = e.clientY;
+      cursor.style.opacity = "1";
+      apply();
+    });
+
+    // 要素の上に乗っているかどうかで拡大状態を切り替え
+    document.addEventListener("mouseover", (e) => {
+      hovering = !!(e.target.closest && e.target.closest(hoverTargets));
+      apply();
+    });
+
+    // 画面外に出たら丸を隠す
+    document.addEventListener("mouseleave", () => { cursor.style.opacity = "0"; });
+    document.addEventListener("mouseenter", () => { cursor.style.opacity = "1"; });
+  })();
 </script>
 
 </body>
