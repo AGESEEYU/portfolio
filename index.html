@@ -641,8 +641,8 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 12px;
-    height: 12px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     /* サーモンピンク（--salmon）＋透明感 */
     background: rgba(246, 167, 142, 0.45);
@@ -650,7 +650,7 @@
     pointer-events: none;
     z-index: 100000;
     opacity: 0;
-    /* なめらかな追従と拡大 */
+    /* なめらかな追従・拡大 */
     transition: transform 0.12s ease-out, opacity 0.25s ease;
     will-change: transform;
   }
@@ -1670,7 +1670,7 @@ Director：Toya Aono`
 
     // 現在位置＋拡大率を反映（中央が指先に来るよう -50% 補正）
     function apply() {
-      const scale = hovering ? 2 : 1;   // 12px → 24px
+      const scale = hovering ? 1.6 : 1;   // 20px → 32px
       cursor.style.transform =
         `translate(${lastX}px, ${lastY}px) translate(-50%, -50%) scale(${scale})`;
     }
@@ -1688,6 +1688,7 @@ Director：Toya Aono`
     // 要素の上に乗っているかどうかで拡大状態を切り替え
     document.addEventListener("mouseover", (e) => {
       hovering = !!(e.target.closest && e.target.closest(hoverTargets));
+      cursor.classList.toggle("is-hover", hovering);
       apply();
     });
 
